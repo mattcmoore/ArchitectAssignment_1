@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV Uploader with History Pop-up</title>
+
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="container">
+ 
+  <div class="left-pane">
+    <button class="button" id="settingsButton">Settings</button>
+    <button class="button" id="historyButton">History</button>
+
+
+    <div id="historyPopup">
+      <h2>History</h2>
+      <button id="closePopup">X</button>
+      <div id="historyContainer">
+        <!-- History content -->
+      </div>
+    </div>
+  </div>
+
+
+  <div class="right-pane">
+    <h2>Upload CSV</h2>
+    <form id="csvUploadForm">
+      <label for="csvFile">Choose CSV file:</label><br>
+      <input type="file" id="csvFile" name="file" accept=".csv" required><br>
+      <button type="button" class="button" onclick="uploadCSV()">Upload</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function(){
+    // Show history popup when history button is clicked
+    $('#historyButton').click(function() {
+      $('#historyPopup').toggle(); // Show or hide the history popup
+    });
+
+    // Close the popup when the 'X' button is clicked
+    $('#closePopup').click(function() {
+      $('#historyPopup').hide();
+    });
+  });
+
+  function uploadCSV() {
+    const formData = new FormData();
+    const fileInput = document.getElementById('csvFile');
+
+    if (fileInput.files.length === 0) {
+      console.log("No file selected.");
+      return;
+    }
+
+    formData.append('file', fileInput.files[0]);
+    console.log(formData);
+
+    fetch('http://127.0.0.1:8080/upload/csv', {
+      method: 'POST',
+      body: formData,
+      mode: 'cors',
+      credentials: 'same-origin'
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(data.message);
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log('File uploaded successfully');
+            })
+            .catch(error => {
+              console.error('Error uploading file: ' + error.message);
+            });
+  }
+  async function fetchHistory() {
+    try {
+     await fetch('http://127.0.0.1:8080/uploads', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors', // This enables CORS
+        credentials: 'same-origin' // You can set this to 'include' to send cookies or authentication headers
+      })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Network response not ok');
+                }
+                return response.json();
+              })
+              .then(data => {
+                const itemsContainer = document.getElementById('historyContainer');
+
+                // Clear previous content
+                itemsContainer.innerHTML = '';
+
+                // Create a container for each item in the response
+                data.forEach(item => {
+                  const itemDiv = document.createElement('div');
+                  itemDiv.className = 'item-container';
+                  itemDiv.textContent = item['name']; // Display the item text
+                  itemsContainer.appendChild(itemDiv);
+
+                });
+              })
+              .catch(error => {
+                console.error('Error fetching the list:', error);
+              });
+    } catch (error) {
+      console.error('Error in fetchItems function:', error);
+    }
+  }
+
+  // Call the fetchItems function on page load
+  window.onload = fetchHistory;
+</script>
+
+</body>
+</html>
