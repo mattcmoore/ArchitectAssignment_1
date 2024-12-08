@@ -1,0 +1,18 @@
+### WHAT I DID
+- Created server route GET uploads
+- Served arraylist of "dummy" uploaded files in JSON
+- Created post route for CSV files
+- Created client for sending CSV files (incomplete, needs RestTemplate config, beans)
+
+Left to do
+- Serve a static thymeleaf modal with file upload input and upload button
+that will send a file to the route
+- Test POST route for csv upload to make sure it works
+- Create new Upload objects when new files hit the route (with appropriate
+constructor arguments depending on upload and parse status)
+- Create static "upload" modal with Thymeleaf, has filepicker input and upload button, that
+stores an CSV file as an input, transfers to the UploadClient service
+and then POSTS to the "/upload/csv" route
+- Create linked "history" modal with Thymeleaf that displays all the info from the history
+JSON object at the "/uploads" route
+- ALL THE TESTING

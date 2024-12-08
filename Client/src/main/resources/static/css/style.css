@@ -1,7 +1,11 @@
 .container {
     display: flex;
     height: 100vh;
+    font-family: "Roboto", sans-serif;
 }
+/*h2 {*/
+/*    font-family: "Roboto", sans-serif;*/
+/*}*/
 .left-pane {
     width: 33.33%;
     background-color: #f0f0f0;
@@ -20,7 +24,7 @@
     width: 80%;
     padding: 10px;
     font-size: 16px;
-    background-color: #007BFF;
+    background-color: blueviolet;
     color: white;
     border: none;
     cursor: pointer;
@@ -29,7 +33,7 @@
     border-radius: 5px;
 }
 .button:hover {
-    background-color: #0056b3;
+    background-color: darkviolet;
 }
 
 #historyPopup {
@@ -68,4 +72,9 @@
 .item-container{
     width: 100%;
     margin-bottom: 10px;
+}
+
+#csvFile{
+    position: relative;
+    top: 10px;
 }

@@ -1,6 +1,8 @@
 package edu.sdccd.cisc191;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import edu.sdccd.cisc191.Model.Upload;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,12 +14,12 @@ import java.util.List;
 public class UploadListControllerTest {
 
     @Autowired
-    private UploadListController uploadListController;
+    private UploadController uploadListController;
 
     @Test
     public void testGetJsonReturnsArrayListOfUpload() {
         // creates the demo upload list
-        UploadListController.createDemoUploadList();
+        UploadController.createDemoUploadList();
 
         // Call the getJson() method
         List<Upload> result = uploadListController.getJson();

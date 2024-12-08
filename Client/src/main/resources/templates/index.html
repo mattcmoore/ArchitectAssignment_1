@@ -6,6 +6,10 @@
   <title>CSV Uploader with History Pop-up</title>
 
   <link rel="stylesheet" th:href="@{/css/style.css}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -50,8 +54,8 @@
     });
   });
 
-  function uploadCSV() {
-    const formData = new FormData();
+  //Uploads .csv onClick
+  async function uploadCSV() {
     const fileInput = document.getElementById('csvFile');
 
     if (fileInput.files.length === 0) {
@@ -59,28 +63,35 @@
       return;
     }
 
+    const formData = new FormData();
     formData.append('file', fileInput.files[0]);
-    console.log(formData);
 
-    fetch('http://127.0.0.1:8080/upload/csv', {
-      method: 'POST',
-      body: formData,
-      mode: 'cors',
-      credentials: 'same-origin'
-    })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error(data.message);
-              }
-              return response.json();
-            })
-            .then(data => {
-              console.log('File uploaded successfully');
-            })
-            .catch(error => {
-              console.error('Error uploading file: ' + error.message);
-            });
+    try {
+      const response = await fetch('http://127.0.0.1:8080/csv', {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors',
+        credentials: 'same-origin'
+      });
+      const result = await response.text();
+      console.log('Server response:', result);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+      // .then(response => {
+      //   if (!response.ok) {
+      //     throw new Error(data.message);
+      //   }
+      //   return response.json();
+      // })
+      // .then(data => {
+      //   console.log('File uploaded successfully');
+      // })
+      // .catch(error => {
+      //   console.error('Error uploading file: ' + error.message);
+      // });
   }
+
   async function fetchHistory() {
     try {
      await fetch('http://127.0.0.1:8080/uploads', {
@@ -88,7 +99,7 @@
         headers: {
           'Content-Type': 'application/json',
         },
-        mode: 'cors', // This enables CORS
+        mode: 'no-cors', // This enables CORS
         credentials: 'same-origin' // You can set this to 'include' to send cookies or authentication headers
       })
               .then(response => {
