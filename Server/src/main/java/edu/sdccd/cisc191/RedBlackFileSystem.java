@@ -168,4 +168,24 @@ public class RedBlackFileSystem {
 
 //        executor.shutdown();
     }
+
+    private void clear(Node node) {
+        if (node == null) {
+            return;
+        }
+
+        clear(node.left);
+        clear(node.right);
+
+        // Set the node's references to null (In Java; garbage collection will handle orphaned nodes)
+        node.left = null;
+        node.right = null;
+        node.parent = null;
+    }
+
+    // THIS CLEARS THE TREE FROM ROOT TO NULL BOTTOM NODES
+    public void clearFileSystem() {
+        clear(root); // Start clearing from the root
+        root = null;     // Set the root to null after clearing the tree
+    }
 }

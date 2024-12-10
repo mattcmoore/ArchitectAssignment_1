@@ -1,5 +1,8 @@
-package edu.sdccd.cisc191;
+package edu.sdccd.cisc191.Controllers;
 
+import edu.sdccd.cisc191.Services.CSVService;
+import edu.sdccd.cisc191.Services.RBTService;
+import edu.sdccd.cisc191.Services.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +19,11 @@ public class CSVDataController {
     @Autowired
     private UploadService uploadService;
 
-    @CrossOrigin(origins = "http://localhost:3000/")
-    @PostMapping("/csv")
+    @Autowired
+    private RBTService rbtService;
+
+    @CrossOrigin(origins = "http://127.0.0.1:3000/")
+    @PostMapping("/upload/csv")
     public ResponseEntity<String> csvUpload(@RequestParam("file") MultipartFile file) {
         String status = "";
         // Check if the file is empty
@@ -44,6 +50,8 @@ public class CSVDataController {
                 return ResponseEntity.ok("Upload tracked");
             } catch(Exception e) {
                 return ResponseEntity.internalServerError().body("Upload Not Tracked");
+            } finally {
+                rbtService.populateFileSystem();
             }
         }
     }
