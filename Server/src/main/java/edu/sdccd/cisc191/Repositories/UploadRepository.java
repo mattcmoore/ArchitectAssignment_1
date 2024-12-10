@@ -7,5 +7,4 @@ import java.util.stream.Stream;
 
 @Repository
 public interface UploadRepository extends JpaRepository<Upload, Long> {
-    Stream<Upload> findAllBy();
 }

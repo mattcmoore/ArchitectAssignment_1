@@ -1,27 +1,48 @@
 package edu.sdccd.cisc191;
 
 import edu.sdccd.cisc191.Model.Upload;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import edu.sdccd.cisc191.Repositories.UploadRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 public class UploadController {
-    public static void createDemoUploadList() {
-//        new Upload("file1.csv",LocalDateTime.now(),15,"uploaded").add();
-//        new Upload("file2.csv",LocalDateTime.now(),25,"failed").add();
-//        new Upload("file3.csv",LocalDateTime.now(),15,"pending").add();
-//        new Upload("file4.csv",LocalDateTime.now(),35,"uploaded").add();
-//        new Upload("file5.csv",LocalDateTime.now(),15,"uploaded").add();
+
+    @Autowired
+    UploadRepository uploadRepository;
+
+    @Autowired
+    RBTService rbtService;
+
+    @Autowired
+    UploadListService uploadListService;
+
+    boolean isReverse = false;
+
+    @CrossOrigin(origins = "http://127.0.0.1:3000/")
+    @GetMapping("/uploads")
+    public List<Upload> getJson() {
+        System.out.println(isReverse);
+        try {
+            return uploadListService.createUploadList(isReverse);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000/")
-    @GetMapping("/uploads")
-    public ArrayList<Upload> getJson() {
-        createDemoUploadList();
-        return Upload.getList();
+    @CrossOrigin(origins = "http://127.0.0.1:3000/")
+    @PostMapping("/upload/reverse")
+    public ResponseEntity<Boolean> toggleReverse(@RequestBody Map<String, Boolean> request) {
+        isReverse = !(request.get("isReverse"));
+        return ResponseEntity.status(HttpStatus.OK).body(isReverse);
     }
 }
 

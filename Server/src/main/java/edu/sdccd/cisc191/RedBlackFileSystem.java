@@ -1,172 +1,171 @@
 package edu.sdccd.cisc191;
 
+import edu.sdccd.cisc191.Model.Upload;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+@Component
 public class RedBlackFileSystem {
-    private FileNode root;
-    private final ReentrantLock lock = new ReentrantLock();
 
-    public RedBlackFileSystem() {
-        this.root = null;
+    private Node root;
+
+    // Insert a value into the Red-Black Tree
+    public void insert(Upload upload) {
+        Node newNode = new Node(upload);
+        root = insert(root, newNode);
+        rebalance(newNode);
+        System.out.println("node inserted");
     }
 
-    // Insert a node
-    public void insert(String filename, LocalDateTime timestamp, int size, String status) {
-        lock.lock();
-        try {
-            FileNode newNode = new FileNode(filename, timestamp, size, status);
-            root = insert(root, newNode);
-            rebalance(newNode);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private FileNode insert(FileNode current, FileNode newNode ) {
+    // Recursive insertion
+    private Node insert(Node current, Node newNode) {
         if (current == null) {
             return newNode;
         }
 
-        if (newNode.filename.compareTo(current.filename) < 0) {
+/*
+ *
+ *choose comparison type
+ *
+ */
+
+        if (newNode.upload.getTimestamp().isBefore(current.upload.getTimestamp())) {
             current.left = insert(current.left, newNode);
-        } else if (newNode.filename.compareTo(current.filename) > 0) {
+            current.left.parent = current;
+        } else if (newNode.upload.getTimestamp().isAfter(current.upload.getTimestamp())) {
             current.right = insert(current.right, newNode);
-        } else {
-            System.out.println("File doesn't exist");
+            current.right.parent = current;
         }
 
         return current;
     }
 
-    // Rebalance according to red-black properties
-    private void rebalance(FileNode node) {
+    public List<Upload> listInOrder()  {
+//        List<Upload> uploadList = Collections.synchronizedList(new ArrayList<>());
+        List<Upload> uploadList = new ArrayList<>();
+        inOrderHelper(root, uploadList);
+        return uploadList;
+    }
+
+
+    public List<Upload> listReverse() {
+//        List<Upload> uploadList = Collections.synchronizedList(new ArrayList<>());
+        List<Upload> uploadList = new ArrayList<>();
+// make not recursive
+        reverseInOrderHelper(root, uploadList);
+        return uploadList;
+    }
+
+    // Fix Red-Black Tree violations after insertion
+    private void rebalance(Node node) {
         while (node != root && node.parent.isRed) {
-            FileNode parent = node.parent;
-            FileNode grandParent = parent.parent;
+            Node grandparent = node.parent.parent;
+            Node uncle = (node.parent == grandparent.left) ? grandparent.right : grandparent.left;
 
-            // Case A: Parent is left child of grandparent
-            if (parent == grandParent.left) {
-                FileNode uncle = grandParent.right;
-
-                // Case 1: Uncle is red -> Recolor
-                if (uncle != null && uncle.isRed) {
-                    grandParent.isRed = true;
-                    parent.isRed = false;
-                    uncle.isRed = false;
-                    node = grandParent;
-                } else {
-                    // Case 2: Node is right child -> Rotate Left
-                    if (node == parent.right) {
-                        rotateLeft(parent);
-                        node = parent;
-                        parent = node.parent;
-                    }
-
-                    // Case 3: Node is left child -> Rotate Right
-                    rotateRight(grandParent);
-                    boolean tempColor = parent.isRed;
-                    parent.isRed = grandParent.isRed;
-                    grandParent.isRed = tempColor;
-                    node = parent;
-                }
+            if (uncle != null && uncle.isRed) {
+                // Case 1: Uncle is red
+                node.parent.isRed = false;
+                uncle.isRed = false;
+                grandparent.isRed = true;
+                node = grandparent;
             } else {
-                // Case B: Parent is right child of grandparent
-                FileNode uncle = grandParent.left;
+                if (node == node.parent.right && node.parent == grandparent.left) {
+                    // Case 2: Left-Right rotation
+                    node = node.parent;
+                    rotateLeft(node);
+                } else if (node == node.parent.left && node.parent == grandparent.right) {
+                    // Case 2: Right-Left rotation
+                    node = node.parent;
+                    rotateRight(node);
+                }
 
-                // Case 1: Uncle is red -> Recolor
-                if (uncle != null && uncle.isRed) {
-                    grandParent.isRed = true;
-                    parent.isRed = false;
-                    uncle.isRed = false;
-                    node = grandParent;
+                // Case 3: Recolor and rotate
+                node.parent.isRed = false;
+                grandparent.isRed = true;
+                if (node == node.parent.left) {
+                    rotateRight(grandparent);
                 } else {
-                    // Case 2: Node is left child -> Rotate Right
-                    if (node == parent.left) {
-                        rotateRight(parent);
-                        node = parent;
-                        parent = node.parent;
-                    }
-
-                    // Case 3: Node is right child -> Rotate Left
-                    rotateLeft(grandParent);
-                    boolean tempColor = parent.isRed;
-                    parent.isRed = grandParent.isRed;
-                    grandParent.isRed = tempColor;
-                    node = parent;
+                    rotateLeft(grandparent);
                 }
             }
         }
-
         root.isRed = false; // Root is always black
     }
 
-    // Rotate left
-    private void rotateLeft(FileNode node) {
-        FileNode rightChild = node.right;
-        node.right = rightChild.left;
-
-        if (rightChild.left != null) {
-            rightChild.left.parent = node;
+    // Helper: Rotate left
+    private void rotateLeft(Node node) {
+        Node temp = node.right;
+        node.right = temp.left;
+        if (temp.left != null) {
+            temp.left.parent = node;
         }
-
-        rightChild.parent = node.parent;
-
+        temp.parent = node.parent;
         if (node.parent == null) {
-            root = rightChild;
+            root = temp;
         } else if (node == node.parent.left) {
-            node.parent.left = rightChild;
+            node.parent.left = temp;
         } else {
-            node.parent.right = rightChild;
+            node.parent.right = temp;
         }
-
-        rightChild.left = node;
-        node.parent = rightChild;
+        temp.left = node;
+        node.parent = temp;
     }
 
-    // Rotate right
-    private void rotateRight(FileNode node) {
-        FileNode leftChild = node.left;
-        node.left = leftChild.right;
-
-        if (leftChild.right != null) {
-            leftChild.right.parent = node;
+    // Helper: Rotate right
+    private void rotateRight(Node node) {
+        Node temp = node.left;
+        node.left = temp.right;
+        if (temp.right != null) {
+            temp.right.parent = node;
         }
-
-        leftChild.parent = node.parent;
-
+        temp.parent = node.parent;
         if (node.parent == null) {
-            root = leftChild;
-        } else if (node == node.parent.left) {
-            node.parent.left = leftChild;
+            root = temp;
+        } else if (node == node.parent.right) {
+            node.parent.right = temp;
         } else {
-            node.parent.right = leftChild;
+            node.parent.left = temp;
         }
-
-        leftChild.right = node;
-        node.parent = leftChild;
+        temp.right = node;
+        node.parent = temp;
     }
 
-    public void displayInOrder() {
-        displayInOrder(root);
-    }
-
-    private void displayInOrder(FileNode node) {
+    // Helper: In-order traversal
+    private void inOrderHelper(Node node, List<Upload> uploadList) {
+//        ExecutorService executor = Executors.newFixedThreadPool(4);
         if (node != null) {
-            displayInOrder(node.left);
-            System.out.println(node);
-            displayInOrder(node.right);
+//            executor.submit( () -> inOrderHelper(node.left,uploadList) );
+//            executor.submit( () -> uploadList.add(node.upload) );
+//            executor.submit( () -> inOrderHelper(node.right,uploadList) );
+            inOrderHelper(node.left,uploadList);
+            uploadList.add(node.upload);
+            inOrderHelper(node.right,uploadList);
+
         }
-    }
-    public void displayReverse() {
-        displayReverse(root);
-    }
-    private void displayReverse(FileNode node) {
-        if (node != null) {
-            displayReverse(node.right);
-            System.out.println(node);
-            displayReverse(node.left);
-        }
+
+//        executor.shutdown();
     }
 
+    // Helper: Reverse in-order traversal
+    private void reverseInOrderHelper(Node node, List<Upload> uploadList) {
+//        ExecutorService executor = Executors.newFixedThreadPool(4);
+        if (node != null) {
+//            executor.submit( () -> inOrderHelper(node.right,uploadList) );
+//            executor.submit( () -> uploadList.add(node.upload) );
+//            executor.submit( () -> inOrderHelper(node.left,uploadList) );
+            inOrderHelper(node.right,uploadList);
+            uploadList.add(node.upload);
+            inOrderHelper(node.left,uploadList);
+        }
+
+//        executor.shutdown();
+    }
 }

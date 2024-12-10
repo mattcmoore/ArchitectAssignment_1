@@ -1,35 +1,18 @@
 package edu.sdccd.cisc191;
 
-import edu.sdccd.cisc191.Model.Entry;
-import edu.sdccd.cisc191.Model.Upload;
-import edu.sdccd.cisc191.Model.Video;
-import edu.sdccd.cisc191.Repositories.EntryRepository;
-import edu.sdccd.cisc191.Repositories.VideoRepository;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class CSVDataController {
 
     @Autowired
     private CSVService csvService;
+
     @Autowired
     private UploadService uploadService;
 
