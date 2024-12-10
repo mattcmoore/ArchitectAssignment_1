@@ -1,18 +1,12 @@
-package edu.sdccd.cisc191;
+package edu.sdccd.cisc191.Services;
 
-import edu.sdccd.cisc191.Model.Upload;
+import edu.sdccd.cisc191.DatabaseSeeder;
+import edu.sdccd.cisc191.RedBlackFileSystem;
 import edu.sdccd.cisc191.Repositories.UploadRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 @Service
 public class RBTService {
@@ -33,6 +27,7 @@ public class RBTService {
     @PostConstruct
     public void populateFileSystem() {
         System.out.println("filesystem inserted");
+        filesystem.clearFileSystem();
         userRepository.findAll().forEach(upload -> {
             filesystem.insert(upload);
         });

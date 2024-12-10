@@ -4,9 +4,10 @@ $(document).ready(function(){
         $('#historyPopup').toggle(); // Show or hide the history popup
     });
 
-    // $('#uploadButton').click(function() {
-    //     uploadCSV();
-    // });
+    $('#uploadButton').click(function() {
+        uploadCSV();
+    });
+
     // Close the popup when the 'X' button is clicked
     $('#closePopup').click(function() {
         $('#historyPopup').hide();
@@ -37,7 +38,7 @@ export async function uploadCSV() {
     formData.append('file', fileInput.files[0]);
 
     try {
-        const response = await fetch('http://127.0.0.1:8080/csv', {
+        const response = await fetch('http://127.0.0.1:8080/upload/csv', {
             method: 'POST',
             body: formData,
             mode: 'no-cors',
@@ -48,8 +49,9 @@ export async function uploadCSV() {
 
     } catch (error) {
         console.error('Error uploading file:', error);
+
     } finally {
-        // loadHistory();
+        loadHistory();
     }
 
 }
@@ -121,8 +123,12 @@ function loadHistory() {
 
             // format LocalDateTime string
             const javaLocalDateTimeString = item['timestamp'];
-            const date = dateFns.parse(javaLocalDateTimeString, "yyyy-MM-dd'T'HH:mm:ss", new Date());
-            const formattedDate = dateFns.format(date, 'MMM dd, yyyy');
+
+            // Format the date without milliseconds
+            const formattedDate = dateFns.format(javaLocalDateTimeString, "yyyy/MM/dd");
+
+            // const date = dateFns.parse(javaLocalDateTimeString, "yyyy-MM-dd'T'HH:mm:ss", new Date());
+            // const formattedDate = dateFns.format(date, 'MMM dd, yyyy');
 
             itemDiv.textContent = item['name'] + '___' + formattedDate + '___' + item['size'] + ' bytes___' + item['status']; // Display the item text
             itemsContainer.appendChild(itemDiv);

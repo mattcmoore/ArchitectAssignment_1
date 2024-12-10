@@ -2,6 +2,7 @@ package edu.sdccd.cisc191;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import edu.sdccd.cisc191.Controllers.UploadController;
 import edu.sdccd.cisc191.Model.Upload;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

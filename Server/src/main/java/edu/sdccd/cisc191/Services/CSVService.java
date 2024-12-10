@@ -1,4 +1,4 @@
-package edu.sdccd.cisc191;
+package edu.sdccd.cisc191.Services;
 
 import edu.sdccd.cisc191.Model.Entry;
 import edu.sdccd.cisc191.Model.Video;
