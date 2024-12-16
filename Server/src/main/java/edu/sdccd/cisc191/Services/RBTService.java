@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class RBTService {
 
     @Autowired
-    public UploadRepository userRepository;
+    public UploadRepository uploadRepository;
 
     @Autowired
     RedBlackFileSystem filesystem = new RedBlackFileSystem();
@@ -28,7 +28,7 @@ public class RBTService {
     public void populateFileSystem() {
         System.out.println("filesystem inserted");
         filesystem.clearFileSystem();
-        userRepository.findAll().forEach(upload -> {
+        uploadRepository.findAll().forEach(upload -> {
             filesystem.insert(upload);
         });
     }

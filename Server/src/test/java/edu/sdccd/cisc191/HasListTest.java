@@ -20,7 +20,7 @@ public class HasListTest {
     @Test
     public void testGetJsonReturnsArrayListOfUpload() {
         // creates the demo upload list
-        UploadController.createDemoUploadList();
+//        UploadController.createDemoUploadList();
 
         // Call the getJson() method
         List<Upload> result = uploadListController.getJson();

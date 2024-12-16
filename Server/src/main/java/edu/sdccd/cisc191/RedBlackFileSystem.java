@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -161,9 +162,9 @@ public class RedBlackFileSystem {
 //            executor.submit( () -> inOrderHelper(node.right,uploadList) );
 //            executor.submit( () -> uploadList.add(node.upload) );
 //            executor.submit( () -> inOrderHelper(node.left,uploadList) );
-            inOrderHelper(node.right,uploadList);
+            reverseInOrderHelper(node.right,uploadList);
             uploadList.add(node.upload);
-            inOrderHelper(node.left,uploadList);
+            reverseInOrderHelper(node.left,uploadList);
         }
 
 //        executor.shutdown();
@@ -173,14 +174,35 @@ public class RedBlackFileSystem {
         if (node == null) {
             return;
         }
+//
+//        clear(node.left);
+//        clear(node.right);
+//
+//        if (root == null) {
+//            return;
+//        }
 
-        clear(node.left);
-        clear(node.right);
+        // Simulated call - stack
+        Stack<Node> fakeCallStack = new Stack<>();
+        fakeCallStack.push(root);
 
-        // Set the node's references to null (In Java; garbage collection will handle orphaned nodes)
-        node.left = null;
-        node.right = null;
-        node.parent = null;
+        while (!fakeCallStack.isEmpty()) {
+            // Pop a node from the stack
+            Node current = fakeCallStack.pop();
+
+            // Push the child nodes onto the stack if they exist
+            if (current.left != null) {
+                fakeCallStack.push(current.left);
+            }
+            if (current.right != null) {
+                fakeCallStack.push(current.right);
+            }
+
+            // In Java, garbage collection will handle orphaned nodes
+            node.left = null;
+            node.right = null;
+            node.parent = null;
+        }
     }
 
     // THIS CLEARS THE TREE FROM ROOT TO NULL BOTTOM NODES

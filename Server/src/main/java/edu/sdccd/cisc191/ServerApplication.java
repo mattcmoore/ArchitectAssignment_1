@@ -21,22 +21,6 @@ public class ServerApplication {
     public static void main(String[] args) {
       SpringApplication.run(ServerApplication.class, args);
 
-//        RedBlackFileSystem testSystem = new RedBlackFileSystem();
-//
-//        testSystem.insert("file1.txt", LocalDateTime.now(), 48, "uploaded");
-//        testSystem.insert("file3.txt", LocalDateTime.now(),48, "failed");
-//        testSystem.insert("file2.txt", LocalDateTime.now(), 48,"pending");
-//        testSystem.insert("file4.txt", LocalDateTime.now(), 48, "uploaded");
-//
-//        testSystem.displayInOrder();
-
-//        RedBlackFileSystem rbTestSystem = new RedBlackFileSystem();
-//        try (Stream<Upload> stream = repository.findAllBy()) {
-//            stream.forEach(upload -> rbTestSystem.insert(upload.getName(), upload.getTimestamp(), upload.getSize(), upload.getStatus()));
-//        }
-//
-//       rbTestSystem.displayInOrder();
-
     }
 
 }
